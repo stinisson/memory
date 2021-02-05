@@ -5,21 +5,16 @@ import java.util.ArrayList;
 
 public class Board {
 
-    private final ArrayList<Card> cardList;
-
-    public Board(int rows, int cols) {
-
-        this.cardList = new ArrayList<>();
+    public static ArrayList<Card> make_board(int rows, int cols) {
+        final ArrayList<Card> cardList = new ArrayList<>();
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Card myCard = new Card(i, j);
                 myCard.setPreferredSize(new Dimension(180, 180));
-                this.cardList.add(myCard);
+                cardList.add(myCard);
             }
         }
-    }
-    public ArrayList<Card> getCards() {
-        return this.cardList;
+        return cardList;
     }
 }

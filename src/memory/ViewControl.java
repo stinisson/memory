@@ -12,44 +12,47 @@ import java.util.ArrayList;
 
 public class ViewControl extends JFrame implements ActionListener {
 
-    ArrayList<Card> cards;
-    BufferedImage[] images;
-    int nPairs;
+    private final BoardGame game;
+    private final int rows;
+    private final int cols;
+    private ArrayList<Card> cards;
+    private BufferedImage[] images;
+    private final int nPairs;
     private final JLabel textLabel;
     private boolean buttonsDisabled = false;
 
-    public ViewControl (String title, int rows, int cols) {
+    public ViewControl (BoardGame game, String title, int rows, int cols) {
         super(title);
-
-        setSize(800, 900);
-        setLayout(new BorderLayout());
+        this.game = game;
+        this.rows = rows;
+        this.cols = cols;
+        this.nPairs = (rows * cols) / 2;
+        this.setSize(800, 900);
+        this.setLayout(new BorderLayout());
 
         JPanel buttonPanel = new JPanel();
-        this.add(buttonPanel, BorderLayout.CENTER);
         buttonPanel.setOpaque(true);
         buttonPanel.setBackground(Color.pink);
+        this.add(buttonPanel, BorderLayout.CENTER);
 
-        textLabel = new JLabel("Pick two cards. If they match it's a pair and you may continue.",
-                JLabel.CENTER);
+        textLabel = new JLabel("Pick two cards. If they match it's a pair.", JLabel.CENTER);
         textLabel.setFont(new Font("Courier New", Font.PLAIN, 14));
         textLabel.setPreferredSize(new Dimension(0, 100));
-        this.add(textLabel, BorderLayout.PAGE_END);
         textLabel.setOpaque(true);
         textLabel.setBackground(Color.pink);
+        this.add(textLabel, BorderLayout.PAGE_END);
 
         // Card images
-        nPairs = (rows * cols)/2;
-        images = new BufferedImage[nPairs];
-        for (int i = 0; i < nPairs; i++) {
+        images = new BufferedImage[this.nPairs];
+        for (int i = 0; i < this.nPairs; i++) {
             try {
-                images[i] = ImageIO.read(new File("src/images/" + (i+1)+ ".jpg"));
+                images[i] = ImageIO.read(new File("src/images/" + (i + 1)+ ".jpg"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        Board board = new Board(rows, cols);
-        cards = board.getCards();
+        cards = Board.make_board(rows, cols); // board.getCards();
         for (Card card : cards) {
             card.addActionListener(this);
             buttonPanel.add(card);
@@ -67,52 +70,48 @@ public class ViewControl extends JFrame implements ActionListener {
         System.out.println("Col " + ((Card) e.getSource()).getJ());
 
         if (buttonsDisabled) {
-            updateText("Wait..");
+            textLabel.setText("Take it easy cowboy..");
             return;
-            }
-
+        }
         clickedButton(((Card) e.getSource()).getI(), ((Card) e.getSource()).getJ());
-        Timer timer = new Timer(2000, turnCards);
-        timer.setRepeats(false);
-        timer.start();
     }
 
     public void clickedButton(int i, int j) {
-        updateBoard(true);
-        buttonsDisabled = true;
+        String status = this.game.move(i, j);
+        updateBoard();
+        updateText();
+
+        if (status.equals("no pair")) {
+            buttonsDisabled = true;
+            Timer timer = new Timer(2000, turnCards);
+            timer.setRepeats(false);
+            timer.start();
+        }
     }
 
-    public void updateBoard(Boolean show_cards) {
-
-        if (show_cards) {
-            for (Card card : cards) {
-                card.setIcon(new ImageIcon(images[cards.indexOf(card)/2]));
-            }
-        } else {
-            for (Card card : cards) {
+    public void updateBoard() {
+        for (Card card : cards) {
+            String status = this.game.getStatus(card.getI(), card.getJ());
+            if (status.equals("x")) {
                 card.setIcon(null);
+            } else {
+                card.setIcon(new ImageIcon(images[Integer.valueOf(status)]));
             }
         }
     }
 
-    private void updateText(String text) {
-        //String gameStatus;
-        textLabel.setText(text);
+    private void updateText() {
+        String message = this.game.getMessage();
+        textLabel.setText(message);
     }
 
     // Swing Timer: http://stackoverflow.com/questions/1006611/java-swing-timer
     private ActionListener turnCards = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            updateBoard(false);
+            game.nextMove();
+            updateBoard();
+            updateText();
             buttonsDisabled = false;
         }
     };
-
-    public void setPlayer(int player) {
-        if (player == 1) {
-            System.out.println("Player one's turn");
-        }
-        updateText("");
-    }
-
 }
