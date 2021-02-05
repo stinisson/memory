@@ -13,9 +13,10 @@ import java.util.ArrayList;
 public class ViewControl extends JFrame implements ActionListener {
 
     ArrayList<Card> cards;
-    BufferedImage images[];
+    BufferedImage[] images;
     int nPairs;
-    private JLabel textLabel;
+    private final JLabel textLabel;
+    private boolean buttonsDisabled = false;
 
     public ViewControl (String title, int rows, int cols) {
         super(title);
@@ -28,9 +29,7 @@ public class ViewControl extends JFrame implements ActionListener {
         buttonPanel.setOpaque(true);
         buttonPanel.setBackground(Color.pink);
 
-
-
-        JLabel textLabel = new JLabel("Pick two cards. If they match it's a pair and you may continue.",
+        textLabel = new JLabel("Pick two cards. If they match it's a pair and you may continue.",
                 JLabel.CENTER);
         textLabel.setFont(new Font("Courier New", Font.PLAIN, 14));
         textLabel.setPreferredSize(new Dimension(0, 100));
@@ -54,7 +53,6 @@ public class ViewControl extends JFrame implements ActionListener {
         for (Card card : cards) {
             card.addActionListener(this);
             buttonPanel.add(card);
-            //card.setIcon(new ImageIcon(images[4]));
         }
 
         // Display board
@@ -68,6 +66,11 @@ public class ViewControl extends JFrame implements ActionListener {
         System.out.println("Row " + ((Card) e.getSource()).getI());
         System.out.println("Col " + ((Card) e.getSource()).getJ());
 
+        if (buttonsDisabled) {
+            updateText("Wait..");
+            return;
+            }
+
         clickedButton(((Card) e.getSource()).getI(), ((Card) e.getSource()).getJ());
         Timer timer = new Timer(2000, turnCards);
         timer.setRepeats(false);
@@ -76,6 +79,7 @@ public class ViewControl extends JFrame implements ActionListener {
 
     public void clickedButton(int i, int j) {
         updateBoard(true);
+        buttonsDisabled = true;
     }
 
     public void updateBoard(Boolean show_cards) {
@@ -91,15 +95,24 @@ public class ViewControl extends JFrame implements ActionListener {
         }
     }
 
-    private void updateText() {
-        textLabel.setText("Test");
+    private void updateText(String text) {
+        //String gameStatus;
+        textLabel.setText(text);
     }
 
     // Swing Timer: http://stackoverflow.com/questions/1006611/java-swing-timer
     private ActionListener turnCards = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
             updateBoard(false);
+            buttonsDisabled = false;
         }
     };
+
+    public void setPlayer(int player) {
+        if (player == 1) {
+            System.out.println("Player one's turn");
+        }
+        updateText("");
+    }
 
 }
