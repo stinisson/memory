@@ -8,5 +8,6 @@ public class RunGame {
         System.out.println("Henlo");
 
         BoardGame game = new MemoryModel();
+        ViewControl viewControl = new ViewControl("Memory", 4, 4);
     }
 }
