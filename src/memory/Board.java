@@ -3,11 +3,11 @@ package memory;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class CardBoard {
+public class Board {
 
     private final ArrayList<Card> cardList;
 
-    public CardBoard(int rows, int cols) {
+    public Board(int rows, int cols) {
 
         this.cardList = new ArrayList<>();
 
