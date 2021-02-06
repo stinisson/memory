@@ -14,7 +14,7 @@ public class ViewControl extends JFrame implements ActionListener {
 
     private final BoardGame game;
     private final int rows;
-    private final int cols;
+    private int cols;
     private ArrayList<Card> cards;
     private BufferedImage[] images;
     private final int nPairs;
@@ -26,8 +26,16 @@ public class ViewControl extends JFrame implements ActionListener {
         this.game = game;
         this.rows = rows;
         this.cols = cols;
+
+        if (cols == 6)
+            this.setSize(1200, 900);
+
+        else if (cols == 5)
+            this.setSize(1000, 900);
+        else
+            this.setSize(800, 900);
+
         this.nPairs = (rows * cols) / 2;
-        this.setSize(800, 900);
         this.setLayout(new BorderLayout());
 
         JPanel buttonPanel = new JPanel();
@@ -52,7 +60,7 @@ public class ViewControl extends JFrame implements ActionListener {
             }
         }
 
-        cards = Board.make_board(rows, cols); // board.getCards();
+        cards = Board.make_board(rows, cols);
         for (Card card : cards) {
             card.addActionListener(this);
             buttonPanel.add(card);
@@ -65,10 +73,6 @@ public class ViewControl extends JFrame implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        System.out.println("\nYou clicked: ");
-        System.out.println("Row " + ((Card) e.getSource()).getI());
-        System.out.println("Col " + ((Card) e.getSource()).getJ());
-
         if (buttonsDisabled) {
             textLabel.setText("Take it easy cowboy..");
             return;

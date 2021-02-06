@@ -101,9 +101,9 @@ public class MemoryModel implements BoardGame {
         if (gameEnded()) {
             message = "Well done! It took " + nAttempts;
             if (nAttempts == 1)
-                 message += " attempt to finish the board.";
+                 message += " try to finish the board.";
             else
-                message +=  " attempts to finish the board.";
+                message +=  " tries to finish the board.";
         }
         return message;
     }
